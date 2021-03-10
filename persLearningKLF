@@ -144,13 +144,13 @@ void switchCondition()
       {
         noFood();
         fed3.logRightPoke();
-        leftPoke = false;
+        rightPoke = false;
       }
       else if (highProb) // higher prob of food
       {
         fed3.logRightPoke();
         yesFood();
-        leftPoke = false;
+        RightPoke = false;
       }
     }
     else if (leftPoke == true)
@@ -159,13 +159,13 @@ void switchCondition()
       {
         noFood();
         fed3.logLeftPoke();
-        rightPoke = false;
+        LefttPoke = false;
       }
       else if (!highProb) // lower prob of food
       {
         fed3.logLeftPoke();
         yesFood();
-        rightPoke = false;
+        LeftPoke = false;
       }
     }
   }
