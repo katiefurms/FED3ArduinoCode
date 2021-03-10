@@ -1,9 +1,8 @@
 #include <FED3.h>
 String sketch = "perseverativeLearning";
 const int MAX_NUM_POKES = 20;
-// const int PROBABILITY = 80;
+const int PROBABILITY = 110;
 bool isInitialCondition = true;
-bool highProb = true;
 
 FED3 fed3 (sketch);
 
@@ -26,20 +25,22 @@ void loop() {
   }
 }
 
-bool isHighProb()
+bool getProbability()
 {
   int randNum;
+  bool isMoreLikely;
 
   randNum = random(0,99);
 
-  if (randNum > 79)
+  if (randNum >= PROBABILITY)
   {
-    return false;
+    isMoreLikely = false;
   }
-  else if (randNum <= 79)
+  else
   {
-    return true;
+    isMoreLikely = true;
   }
+  return isMoreLikely;
 }
 
 void yesFood()
@@ -76,18 +77,15 @@ void initialCondition()
         fed3.colorWipe(fed3.strip.Color(0, 0, 0), 0);
       }
     }
-
-    
     if (leftPoke == true)
-    { 
-      bool highProb = isHighProb();     
-      if (!highProb) // lower prob of tone
+    {      
+      if (!getProbability()) // lower prob of tone
       {
         noFood();
         fed3.logLeftPoke();
         leftPoke = false;
       }
-      else if (highProb) // higher prob of food
+      else // higher prob of food
       {
         fed3.logLeftPoke();
         yesFood();
@@ -96,13 +94,13 @@ void initialCondition()
     }
     else if (rightPoke == true)
     {      
-      if (highProb) // higher prob of tone
+      if (getProbability()) // higher prob of tone
       {
         noFood();
         fed3.logRightPoke();
         rightPoke = false;
       }
-      else if (!highProb) // lower prob of food
+      else // lower prob of food
       {
         fed3.logRightPoke();
         yesFood();
@@ -110,7 +108,7 @@ void initialCondition()
       }
     }
   }
-  isInitialCondition = false;
+  isInitialCondition = true;
 }
 
 void switchCondition()
@@ -135,18 +133,15 @@ void switchCondition()
         fed3.colorWipe(fed3.strip.Color(0, 0, 0), 0);
       }
     }
-
-    
-    if (rightPoke == true)
-    { 
-      bool highProb = isHighProb();     
-      if (!highProb) // lower prob of tone
+    if (rightPoke == true) 
+    {      
+      if (!getProbability()) // lower prob of tone
       {
         noFood();
         fed3.logRightPoke();
         rightPoke = false;
       }
-      else if (highProb) // higher prob of food
+      else // higher prob of food
       {
         fed3.logRightPoke();
         yesFood();
@@ -155,13 +150,13 @@ void switchCondition()
     }
     else if (leftPoke == true)
     {      
-      if (highProb) // higher prob of tone
+      if (getProbability()) // higher prob of tone
       {
         noFood();
         fed3.logLeftPoke();
         leftPoke = false;
       }
-      else if (!highProb) // lower prob of food
+      else // lower prob of food
       {
         fed3.logLeftPoke();
         yesFood();
