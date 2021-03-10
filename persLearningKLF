@@ -1,0 +1,172 @@
+#include <FED3.h>
+String sketch = "perseverativeLearning";
+const int MAX_NUM_POKES = 20;
+const int PROBABILITY = 80;
+bool isInitialCondition = true;
+
+FED3 fed3 (sketch);
+
+void setup() {
+  // put your setup code here, to run once:
+  fed3.begin();
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  fed3.run();
+
+  if (isInitialCondition == true)
+  {
+    initialCondition();
+  }
+  else
+  {
+    switchCondition();
+  }
+}
+
+bool isHighProb()
+{
+  int randNum;
+
+  randNum = random(0,99);
+
+  if (randNum > 79)
+  {
+    return false;
+  }
+  else if (randNum <= 79)
+  {
+    return true;
+  }
+}
+
+void yesFood()
+{
+  fed3.colorWipe(fed3.strip.Color(0, 2, 2), 40);
+  fed3.Feed();
+}
+
+void noFood()
+{
+  fed3.Tone(4000,200);
+}
+
+void initialCondition()
+{
+  bool rightPoke = false;
+  bool leftPoke = false;
+  
+  fed3.colorWipe(fed3.strip.Color(100, 0, 0), 40);
+  for (int i = 0; i < MAX_NUM_POKES; i++)
+  {  
+    while (!rightPoke && !leftPoke)
+    {
+      if (fed3.Right)
+      {
+        rightPoke = true;
+      }
+      else if (fed3.Left)
+      {
+        leftPoke = true;
+      }
+      else
+      {
+        fed3.colorWipe(fed3.strip.Color(0, 0, 0), 0);
+      }
+    }
+
+    
+    if (leftPoke == true)
+    { 
+      highProb = isHighProb()     
+      if (!highProb) // lower prob of tone
+      {
+        noFood();
+        fed3.logLeftPoke();
+        leftPoke = false;
+      }
+      else if (highProb) // higher prob of food
+      {
+        fed3.logLeftPoke();
+        yesFood();
+        leftPoke = false;
+      }
+    }
+    else if (rightPoke == true)
+    {      
+      if (highProb) // higher prob of tone
+      {
+        noFood();
+        fed3.logRightPoke();
+        rightPoke = false;
+      }
+      else if (!highProb) // lower prob of food
+      {
+        fed3.logRightPoke();
+        yesFood();
+        rightPoke = false;
+      }
+    }
+  }
+  isInitialCondition = true;
+}
+
+void switchCondition()
+{
+  bool rightPoke = false;
+  bool leftPoke = false;
+  fed3.colorWipe(fed3.strip.Color(100, 0, 0), 40);
+  for (int i = 0; i < MAX_NUM_POKES; i++)
+  {
+    while (!rightPoke && !leftPoke)
+    {
+      if (fed3.Right)
+      {
+        rightPoke = true;
+      }
+      else if (fed3.Left)
+      {
+        leftPoke = true;
+      }
+      else
+      {
+        fed3.colorWipe(fed3.strip.Color(0, 0, 0), 0);
+      }
+    }
+
+    
+    if (rightPoke == true)
+    { 
+      highProb = isHighProb()     
+      if (!highProb) // lower prob of tone
+      {
+        noFood();
+        fed3.logLeftPoke();
+        leftPoke = false;
+      }
+      else if (highProb) // higher prob of food
+      {
+        fed3.logLeftPoke();
+        yesFood();
+        leftPoke = false;
+      }
+    }
+    else if (leftPoke == true)
+    {      
+      if (highProb) // higher prob of tone
+      {
+        noFood();
+        fed3.logRightPoke();
+        rightPoke = false;
+      }
+      else if (!highProb) // lower prob of food
+      {
+        fed3.logRightPoke();
+        yesFood();
+        rightPoke = false;
+      }
+    }
+  }
+  isInitialCondition = true;
+}
