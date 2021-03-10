@@ -3,6 +3,7 @@ String sketch = "perseverativeLearning";
 const int MAX_NUM_POKES = 20;
 const int PROBABILITY = 80;
 bool isInitialCondition = true;
+bool highProb = true;
 
 FED3 fed3 (sketch);
 
@@ -79,7 +80,7 @@ void initialCondition()
     
     if (leftPoke == true)
     { 
-      highProb = isHighProb()     
+      bool highProb = isHighProb();     
       if (!highProb) // lower prob of tone
       {
         noFood();
@@ -138,7 +139,7 @@ void switchCondition()
     
     if (rightPoke == true)
     { 
-      highProb = isHighProb()     
+      bool highProb = isHighProb();     
       if (!highProb) // lower prob of tone
       {
         noFood();
