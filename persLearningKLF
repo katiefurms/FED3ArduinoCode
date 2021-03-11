@@ -1,8 +1,8 @@
 #include <FED3.h>
-String sketch = "perseverativeLearning";
-const int MAX_NUM_POKES = 20;
-const int PROBABILITY = 110;
-bool isInitialCondition = true;
+String sketch = "perseverativeLearning"; // name the sketch
+const int MAX_NUM_POKES = 20; // this is the number of pokes in one block, before probabilities switch ports
+const int PROBABILITY = 80; // this is the probability cutoff. PROBABILITY = 80 means the probabilities will be 80% or 20% for a given port
+bool isInitialCondition = true; // bool which swtiches at the end of a block MAX_NUM_POKES long, allowing us to switch probabilities
 
 FED3 fed3 (sketch);
 
@@ -14,7 +14,7 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   fed3.run();
-
+// if we've not yet reached the threshold MAX_NUM_POKES, stay in the initial probability condition. If we have, switch conditions.
   if (isInitialCondition == true)
   {
     initialCondition();
@@ -25,7 +25,7 @@ void loop() {
   }
 }
 
-bool getProbability()
+bool getProbability() // a function to get a random number, and decide whether we are above or below the threshold defined by PROBABILITY
 {
   int randNum;
   bool isMoreLikely;
@@ -43,26 +43,26 @@ bool getProbability()
   return isMoreLikely;
 }
 
-void yesFood()
+void yesFood() // a function containing actions to take if the poke is to trigger a pellet drop
 {
-  fed3.colorWipe(fed3.strip.Color(0, 2, 2), 40);
-  fed3.Feed();
+  fed3.colorWipe(fed3.strip.Color(0, 2, 2), 40); //blue colorwipe is CS+
+  fed3.Feed(); // drop a pellet
 }
 
-void noFood()
+void noFood() // a function containing actions to take if the poke is to trigger a pellet drop
 {
-  fed3.Tone(4000,200);
+  fed3.Tone(4000,200); // 4000Hz tone is CS-
 }
 
-void initialCondition()
+void initialCondition() // define the probability of each port, and what is to execute from them, during the initial condition
 {
   bool rightPoke = false;
   bool leftPoke = false;
   
-  fed3.colorWipe(fed3.strip.Color(100, 0, 0), 40);
-  for (int i = 0; i < MAX_NUM_POKES; i++)
+  fed3.colorWipe(fed3.strip.Color(100, 0, 0), 40); // this will be taken out in the final code, but is here now to trigger a red colorwipe when conditions switch so that we can troubleshoot.
+  for (int i = 0; i < MAX_NUM_POKES; i++) // only run this loop until we reach MAX_NUM_POKES, at which point it should switch
   {  
-    while (!rightPoke && !leftPoke)
+    while (!rightPoke && !leftPoke) // keep checking for a left or right poke as long as the mouse isn't poking
     {
       if (fed3.Right)
       {
@@ -74,51 +74,51 @@ void initialCondition()
       }
       else
       {
-        fed3.colorWipe(fed3.strip.Color(0, 0, 0), 0);
+        fed3.colorWipe(fed3.strip.Color(0, 0, 0), 0); // this line does nothing, but we found it was necessary to include an "else" condition to keep the while loop running. 
       }
     }
-    if (leftPoke == true)
+    if (leftPoke == true) // code to execute if a leftpoke is detected
     {      
-      if (!getProbability()) // lower prob of tone
+      if (!getProbability()) // After a left poke, this is the lower probability (20%, if PROBABILITY = 80) sequence of events
       {
-        noFood();
-        fed3.logLeftPoke();
-        leftPoke = false;
+        noFood(); // play a 4000Hz tone
+        fed3.logLeftPoke(); // log a poke on the left
+        leftPoke = false; // change the leftpoke variable back to false so it doesn't just perpetually keep playing the tone
       }
-      else // higher prob of food
+      else // After a left poke, this is the higher probability (80%, if PROBABILITY = 80) sequence of events
       {
-        fed3.logLeftPoke();
-        yesFood();
-        leftPoke = false;
+        fed3.logLeftPoke(); // log a poke on the left
+        yesFood(); // initiate a blue colorwipe (CS+) and drop a food pellet
+        leftPoke = false; // change the leftpoke variable back to false so it doesn't just perpetually keep dropping pellets and CS+s
       }
     }
-    else if (rightPoke == true)
+    else if (rightPoke == true) // code to execute if a leftpoke is detected
     {      
-      if (getProbability()) // higher prob of tone
+      if (getProbability()) // After a right poke, this is the higher probability (80%, if PROBABILITY = 80) sequence of events
       {
-        noFood();
-        fed3.logRightPoke();
-        rightPoke = false;
+        noFood(); // play a 4000Hz tone
+        fed3.logRightPoke(); // log a poke on the right
+        rightPoke = false; // change the rightpoke variable back to false so it doesn't just perpetually keep playing the tone
       }
-      else // lower prob of food
+      else // After a right poke, this is the lower probability (20%, if PROBABILITY = 80) sequence of events
       {
-        fed3.logRightPoke();
-        yesFood();
-        rightPoke = false;
-      }
+        fed3.logRightPoke(); // log a poke on the right
+        yesFood(); // initiate a blue colorwipe (CS+) and drop a food pellet
+        rightPoke = false; // change the rightpoke variable back to false so it doesn't just perpetually keep dropping pellets and CS+s
+      } 
     }
   }
-  isInitialCondition = true;
+  isInitialCondition = false; // switch the initial condition back to false, so that the main loop knows to switch to the other probability condition after MAX_NUM_POKES number of pokes
 }
 
-void switchCondition()
+void switchCondition() // define the probability of each port, and what is to execute from them, during the switch condition
 {
   bool rightPoke = false;
   bool leftPoke = false;
-  fed3.colorWipe(fed3.strip.Color(100, 0, 0), 40);
-  for (int i = 0; i < MAX_NUM_POKES; i++)
+  fed3.colorWipe(fed3.strip.Color(100, 0, 0), 40); // this will be taken out in the final code, but is here now to trigger a red colorwipe when conditions switch so that we can troubleshoot.
+  for (int i = 0; i < MAX_NUM_POKES; i++) // only run this loop until we reach MAX_NUM_POKES, at which point it should switch
   {
-    while (!rightPoke && !leftPoke)
+    while (!rightPoke && !leftPoke) // keep checking for a left or right poke as long as the mouse isn't poking
     {
       if (fed3.Right)
       {
@@ -130,39 +130,40 @@ void switchCondition()
       }
       else
       {
-        fed3.colorWipe(fed3.strip.Color(0, 0, 0), 0);
+        fed3.colorWipe(fed3.strip.Color(0, 0, 0), 0); // this line does nothing, but we found it was necessary to include an "else" condition to keep the while loop running. 
       }
     }
-    if (rightPoke == true) 
+    if (rightPoke == true) // code to execute if a rightpoke is detected
     {      
-      if (!getProbability()) // lower prob of tone
+      if (!getProbability()) // After a right poke, this is the lower probability (20%, if PROBABILITY = 80) sequence of events
       {
-        noFood();
-        fed3.logRightPoke();
-        rightPoke = false;
+        noFood(); // play a 4000Hz tone
+        fed3.logRightPoke(); // log a poke on the right
+        rightPoke = false; // change the rightpoke variable back to false so it doesn't just perpetually keep playing the tone
       }
-      else // higher prob of food
+      else // After a right poke, this is the higher probability (80%, if PROBABILITY = 80) sequence of events
       {
-        fed3.logRightPoke();
-        yesFood();
-        rightPoke = false;
+        fed3.logRightPoke(); // log a poke on the right
+        yesFood(); // initiate a blue colorwipe (CS+) and drop a food pellet
+        rightPoke = false; // change the rightpoke variable back to false so it doesn't just perpetually keep dropping pellets and CS+s
       }
     }
-    else if (leftPoke == true)
+    else if (leftPoke == true) // code to execute if a rightpoke is detected
     {      
-      if (getProbability()) // higher prob of tone
+      if (getProbability()) // After a left poke, this is the higher probability (80%, if PROBABILITY = 80) sequence of events
       {
-        noFood();
-        fed3.logLeftPoke();
-        leftPoke = false;
+        noFood(); // play a 4000Hz tone
+        fed3.logLeftPoke(); // log a poke on the left
+        leftPoke = false; // change the leftpoke variable back to false so it doesn't just perpetually keep playing the tone
       }
-      else // lower prob of food
+      else // After a left poke, this is the lower probability (20%, if PROBABILITY = 80) sequence of events
       {
-        fed3.logLeftPoke();
-        yesFood();
-        leftPoke = false;
+        fed3.logLeftPoke(); // log a poke on the left
+        yesFood(); // initiate a blue colorwipe (CS+) and drop a food pellet
+        leftPoke = false; // change the leftpoke variable back to false so it doesn't just perpetually keep dropping pellets and CS+s
       }
     }
   }
-  isInitialCondition = true;
+  isInitialCondition = true; // switch the initial condition back to truee, so that the main loop knows to switch back to the other probability condition after MAX_NUM_POKES number of pokes
+
 }
