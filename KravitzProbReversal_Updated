@@ -24,18 +24,34 @@ FED3 fed3 (sketch);                                     //Start the FED3 object 
 
 int probability = 80;                                   //Probability of pellet on the high-reward poke
 int trialsToSwitch = 10;                                //# of trials before probabilities on the pokes switch
-int counter = 1;                                        //trial counter variable - don't change this
-int trialTimeout = 0;                                   //timeout duration after each poke, set to 0 to remove the timeout
+int counter;                                            //trial counter variable - don't change this
+int trialTimeout = 0;                                   //timeout duration after each poke, set to 0 to remove the timeout 
 
 void setup() {
   fed3.begin();                                         //Setup the FED3 hardware, all pinmode screen etc, initialize SD card
+
+  // Brandon & Katie edits
+  randomSeed(analogRead(0));
+  int randNum = random(100);
+
+  if (randNum % 2)                     
+  { 
+    counter = 1;
+  }
+  else
+  {
+    counter = 11; 
+  }
+  // Brandon & Katie edits
 }
 
 void loop() {
+
   ////////////////////////////////////////////////
   // Determine which poke is active based on the trial number. 
   // fed3.activePoke=1 means Left poke is active, fed3.activePoke=0 means Right poke is active.
   ////////////////////////////////////////////////
+  
   if (counter == ((trialsToSwitch * 2)+1)) counter = 1;
   if (counter <= trialsToSwitch) fed3.activePoke = 1;
   if (counter > trialsToSwitch) fed3.activePoke = 0;
@@ -43,7 +59,7 @@ void loop() {
   fed3.run();                                           //Call fed.run at least once per loop
 
   ////////////////////////////////////////////////
-  // There are 4 cases we need to account for:
+  // There are 4 cases we need to account for: ///
   ////////////////////////////////////////////////
 
   // Case 1: The *left* poke is the high probability poke and animal pokes *left*
