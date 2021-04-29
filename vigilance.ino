@@ -7,7 +7,7 @@ unsigned long trialStartTime;                   // time that has passed at the s
 unsigned long timeout;                          // full timeout period in which mouse shouldn't poke  
 unsigned long trialPeriod = 3000;
 unsigned long cuePeriod = 1000;
-const int failStateTimeout = 8;
+const int failStateTimeout = 1;
 const int trialClearTimeout = 8;
 int randNum;
 bool leftActive = false;
@@ -37,10 +37,12 @@ void loop()
   if (randNum % 2)
   {
     rightActive = true; // set right port to be active
+    fed3.activePoke = 0;
   }
   else
   {
     leftActive = true; // set left port to be active
+    fed3.activePoke = 1;
   }
 
   // start of trial
@@ -52,12 +54,14 @@ void loop()
   {
     if (fed3.Right)
     {
+      fed3.logRightPoke();
       failState();
       fed3.Right = false;
       break;
     }
     else if (fed3.Left)
     {
+      fed3.logLeftPoke();
       failState();
       fed3.Left = false;
       break;
@@ -71,7 +75,7 @@ void loop()
 
   if (rightActive) // if right port is active
   {
-    fed3.rightStimulus();
+    rightLight();                  
 
     pokeWindowStart = millis();
     trialTimeout = pokeWindowStart + trialPeriod;
@@ -87,12 +91,14 @@ void loop()
   
       if (fed3.Right)
       {
+        fed3.logRightPoke();
         fed3.Feed();
         fed3.Right = false;
         break;
       }
       else if (fed3.Left)
       {
+        fed3.logLeftPoke();
         failState();
         fed3.Left = false;
         break;
@@ -101,7 +107,7 @@ void loop()
   }
   else if (leftActive)
   {
-    fed3.leftStimulus();
+    leftLight();
 
     pokeWindowStart = millis();
     trialTimeout = pokeWindowStart + trialPeriod;
@@ -115,14 +121,16 @@ void loop()
       }
       fed3.colorWipe(fed3.strip.Color(0, 0, 0), 1);
       
-      if (fed3.Left)
+      if (fed3.Left) 
       {
+        fed3.logLeftPoke();
         fed3.Feed();
         fed3.Left = false;
         break;
       }
       else if (fed3.Right)
       {
+        fed3.logRightPoke();
         failState();
         fed3.Right = false;
         break;
@@ -146,4 +154,18 @@ bool failState()
   fed3.Timeout(failStateTimeout);
 
   return inFailState = true;
+}
+
+void rightLight()
+{
+  fed3.rightStimulus();
+  fed3.Event = "Right light";
+  fed3.logdata(); 
+}
+
+void leftLight()
+{
+  fed3.leftStimulus();
+  fed3.Event = "Left light";
+  fed3.logdata(); 
 }
